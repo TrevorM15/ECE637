@@ -62,32 +62,31 @@ int main (int argc, char **argv)
  /* TODO: filter image channels */
  
     for (k =0; k < 3; k++){
-      for ( i =3; i < pad_height-8; i++ ){
-	for ( j = 3; j < pad_width-8; j++ ) {
-	  for (l = -3; l<5;l++){
-	    for (m = -3;m<5;m++){
+      for ( i =4; i < input_img.height+4; i++ ){
+	for ( j = 4; j < input_img.width+4; j++ ) {
+	  for (l = -4; l<5;l++){
+	    for (m = -4;m<5;m++){
 	      img[k][i][j] +=img[k][i+l][j+m]/81.0;
 	    }
 	  }
 	}
       }
     } 
- 
-
-  
+   
   /* set up structure for output color image */
   /* Note that the type is 'c' rather than 'g' */
   get_TIFF ( &color_img, input_img.height, input_img.width, 'c' );
 
   /* construct color image from filtered channels */
-  for (k = 0; k<3; k++)
-    for ( i = 3; i <pad_height-8; i++ )
-      for ( j = 3; j < pad_width-8; j++ ) {
-          color_img.color[k][i][j] = img[k][i][j];
+  for (k = 0; k<3; k++){
+    for ( i = 4; i <input_img.height+4; i++ ){
+      for ( j = 4; j < input_img.width+4; j++ ) {
+          color_img.color[k][i-4][j-4] = img[k][i][j];
       }
-
+    }
+  }
   /* open color image file */
-  if ( ( fp = fopen ( "color_LP.tif", "wb" ) ) == NULL ) {
+  if ( ( fp = fopen ( "color.tif", "wb" ) ) == NULL ) {
       fprintf ( stderr, "cannot open file color.tif\n");
       exit ( 1 );
   }
