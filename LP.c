@@ -11,7 +11,8 @@ int main (int argc, char **argv)
   FILE *fp;
   struct TIFF_img input_img, color_img;
   int lfilt =9;
-  int32_t i,j,k;
+  int hfilt =(lfilt-1)/2;
+  int32_t i,j,k,l,m;
 
   if ( argc != 2 ) error( argv[0] );
 
@@ -38,18 +39,40 @@ int main (int argc, char **argv)
 
   /* Allocate image of double precision floats and zero pad */
   double ***img = (double ***)malloc(3*sizeof(double **));
+  int pad_width = input_img.width+lfilt-1;
+  int pad_height = input_img.height+lfilt-1;
   for (i = 0; i<3; i++){
-    img[i]= (double **)get_img(input_img.width,input_img.height,sizeof(double));
+    img[i]= (double **)get_img(pad_width,pad_height,sizeof(double));
   }
+    for (k = 0; k < 3; k++)
+    for ( i = 0; i < pad_height; i++ )
+      for ( j = 0; j < pad_width; j++ ) {
+	img[k][i][j] =0;
+  }
+
     /* copy components to double array */
-  for (k = 0; k < 3; k++)
-    for ( i =0; i < input_img.height; i++ )
-      for ( j = 0; j < input_img.width; j++ ) {
+     
+    for (k = 0; k < 3; k++)
+    for ( i = 3; i < pad_height-8; i++ )
+      for ( j = 3; j < pad_width-8; j++ ) {
 	img[k][i][j] = input_img.color[k][i][j];
   }
-  
- /* TODO: filter image channels */
 
+    
+ /* TODO: filter image channels */
+ 
+    for (k =0; k < 3; k++){
+      for ( i =3; i < pad_height-8; i++ ){
+	for ( j = 3; j < pad_width-8; j++ ) {
+	  for (l = -3; l<5;l++){
+	    for (m = -3;m<5;m++){
+	      img[k][i][j] +=img[k][i+l][j+m]/81.0;
+	    }
+	  }
+	}
+      }
+    } 
+ 
 
   
   /* set up structure for output color image */
@@ -58,13 +81,13 @@ int main (int argc, char **argv)
 
   /* construct color image from filtered channels */
   for (k = 0; k<3; k++)
-    for ( i = 0; i < input_img.height; i++ )
-      for ( j = 0; j < input_img.width; j++ ) {
+    for ( i = 3; i <pad_height-8; i++ )
+      for ( j = 3; j < pad_width-8; j++ ) {
           color_img.color[k][i][j] = img[k][i][j];
       }
 
   /* open color image file */
-  if ( ( fp = fopen ( "color.tif", "wb" ) ) == NULL ) {
+  if ( ( fp = fopen ( "color_LP.tif", "wb" ) ) == NULL ) {
       fprintf ( stderr, "cannot open file color.tif\n");
       exit ( 1 );
   }
