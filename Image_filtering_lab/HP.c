@@ -13,7 +13,7 @@ int main (int argc, char **argv)
   int lfilt =9;
   int hfilt =(lfilt-1)/2;
   int32_t i,j,k,l,m;
-
+  int lambda = 1;
   if ( argc != 2 ) error( argv[0] );
 
   /* open image file */
@@ -64,10 +64,9 @@ int main (int argc, char **argv)
     for (k =0; k < 3; k++){
       for ( i =hfilt; i < input_img.height+hfilt; i++ ){
 	for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-	  img[k][i][j]=0;
 	  for (l = -hfilt; l<hfilt+1;l++){
 	    for (m = -hfilt;m<hfilt+1;m++){
-	      img[k][i][j] +=img[k][i-l][j+m]/(lfilt*lfilt);
+	      img[k][i][j] -=lambda*img[k][i-l][j+m]/(lfilt*lfilt);
 	    }
 	  }
 	}
