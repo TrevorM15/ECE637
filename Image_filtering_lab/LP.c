@@ -64,9 +64,10 @@ int main (int argc, char **argv)
     for (k =0; k < 3; k++){
       for ( i =4; i < input_img.height+4; i++ ){
 	for ( j = 4; j < input_img.width+4; j++ ) {
+	  img[k][i][j]=0;
 	  for (l = -4; l<5;l++){
 	    for (m = -4;m<5;m++){
-	      img[k][i][j] +=img[k][i+l][j+m]/81.0;
+	      img[k][i][j] +=img[k][i-l][j+m]/81.0;
 	    }
 	  }
 	}
