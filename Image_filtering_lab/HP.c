@@ -53,9 +53,9 @@ int main (int argc, char **argv)
     /* copy components to double array */
      
     for (k = 0; k < 3; k++)
-    for ( i =hfilt-1; i < pad_height-lfilt+1; i++ )
-      for ( j = hfilt-1; j < pad_width-lfilt+1; j++ ) {
-	img[k][i][j] = input_img.color[k][i][j];
+    for ( i =0; i < input_img.height; i++ )
+      for ( j = 0; j < input_img.width; j++ ) {
+	img[k][i+hfilt][j+hfilt] = input_img.color[k][i][j];
   }
 
     
