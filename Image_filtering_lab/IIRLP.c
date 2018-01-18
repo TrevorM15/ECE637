@@ -10,7 +10,7 @@ int main (int argc, char **argv)
 {
   FILE *fp;
   struct TIFF_img input_img, color_img;
-  int lfilt =5;
+  int lfilt =3;
   int hfilt =(lfilt-1)/2;
   int32_t i,j,k,l,m;
   int lambda = 1.5;
@@ -64,14 +64,7 @@ int main (int argc, char **argv)
     for (k =0; k < 3; k++){
       for ( i =hfilt; i < input_img.height+hfilt; i++ ){
 	for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-	  img[k][i][j]=(1+lambda-(1/(lfilt*lfilt)))*img[k][i][j]; 
-	  for (l = -hfilt; l<hfilt+1;l++){
-	    for (m = -hfilt;m<hfilt+1;m++){
-	      if((l!=0)||(m!=0)){
-	      img[k][i][j] -=lambda*img[k][i+l][j+m]/(lfilt*lfilt);
-	      }
-	    }
-	  }
+	  img[k][i][j]=0.01*img[k][i][j]+0.9*(img[k][i+1][j]+img[k][i][j+1]-0.81*img[k][i+1][j+1]);
 	}
       }
     } 
