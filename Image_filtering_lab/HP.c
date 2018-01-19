@@ -40,11 +40,13 @@ int main (int argc, char **argv)
   /* Allocate image of double precision floats and zero pad */
   double ***img = (double ***)malloc(3*sizeof(double **));
   double ***img2 = (double ***)malloc(3*sizeof(double **));
+  double ***img3 = (double ***)malloc(3*sizeof(double **));
   int pad_width = input_img.width+lfilt-1;
   int pad_height = input_img.height+lfilt-1;
   for (i = 0; i<3; i++){
     img[i]= (double **)get_img(pad_width,pad_height,sizeof(double));
     img2[i]= (double **)get_img(pad_width,pad_height,sizeof(double));
+    img3[i]= (double **)get_img(pad_width,pad_height,sizeof(double));
   }
     for (k = 0; k < 3; k++)
     for ( i = 0; i < pad_height; i++ )
@@ -66,6 +68,7 @@ int main (int argc, char **argv)
     for ( i =0; i < pad_height; i++ )
       for ( j = 0; j < pad_width; j++ ) {
 	img2[k][i][j] = img[k][i][j];
+	img3[k][i][j] = img[k][i][j];
       }
  
     
@@ -85,15 +88,13 @@ int main (int argc, char **argv)
 	}
       }
     } 
-    /* high-pass image */
+    /* create high-pass filter */
   
     for (k =0; k < 3; k++)
       for ( i =hfilt; i < input_img.height+hfilt; i++ )
 	for ( j = hfilt; j < input_img.width+hfilt; j++ ){
-	  img2[k][i][j] = 1+lambda*(img2[k][i][j]-img[k][i][j]);
+	  img2[k][i][j] = img2[k][i][j]+lambda*(img2[k][i][j]-img[k][i][j]);
 	}
-
-  
   /* set up structure for output color image */
   /* Note that the type is 'c' rather than 'g' */
   get_TIFF ( &color_img, input_img.height, input_img.width, 'c' );
@@ -133,6 +134,10 @@ int main (int argc, char **argv)
   free_img((void**)img2[1]);
   free_img((void**)img2[2]);
   free(img2);
+  free_img((void**)img3[0]);
+  free_img((void**)img3[1]);
+  free_img((void**)img3[2]);
+  free(img3);
   
   return(0);
 }
