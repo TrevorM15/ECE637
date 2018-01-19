@@ -10,7 +10,7 @@ int main (int argc, char **argv)
 {
   FILE *fp;
   struct TIFF_img input_img, color_img;
-  int lfilt =3;
+  int lfilt =5;
   int hfilt =(lfilt-1)/2;
   int32_t i,j,k,l,m;
   int lambda =1.5;
@@ -39,18 +39,15 @@ int main (int argc, char **argv)
 
   /* Allocate image of double precision floats and zero pad */
   double ***img = (double ***)malloc(3*sizeof(double **));
-  double ***img2 = (double ***)malloc(3*sizeof(double **));
   int pad_width = input_img.width+lfilt-1;
   int pad_height = input_img.height+lfilt-1;
   for (i = 0; i<3; i++){
     img[i]= (double **)get_img(pad_width,pad_height,sizeof(double));
-    img2[i]= (double **)get_img(pad_width,pad_height,sizeof(double));
   }
     for (k = 0; k < 3; k++)
     for ( i = 0; i < pad_height; i++ )
       for ( j = 0; j < pad_width; j++ ) {
 	img[k][i][j] =0;
-	img2[k][i][j] =0;
   }
 
     /* copy components to double array */
@@ -64,14 +61,14 @@ int main (int argc, char **argv)
  /* filter image channels */
 
     for (k =0; k < 3; k++)
-      for ( i =hfilt; i < input_img.height+hfilt; i++ )
+    for ( i =hfilt; i < input_img.height+hfilt; i++ )
       for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-	img2[k][i][j]=0.01*img[k][i][j]+0.9*(img2[k][i-1][j]+img2[k][i][j-1])-0.81*img2[k][i-1][j-1];
-  	  if (img2[k][i][j] >255) {
-	    img2[k][i][j] =255;
+	  img[k][i][j]=0.01*img[k][i][j]+0.9*(img[k][i+1][j]+img[k][i][j+1]-0.81*img[k][i+1][j+1]);
+  	  if (img[k][i][j] >255) {
+	    img[k][i][j] =255;
 	  }
-	  else if(img2[k][i][j]<0){
-	    img2[k][i][j]=0;
+	  else if(img[k][i][j]<0){
+	    img[k][i][j]=0;
 	  }
 	}
     
@@ -83,7 +80,7 @@ int main (int argc, char **argv)
   for (k = 0; k<3; k++){
     for ( i = hfilt; i <input_img.height+hfilt; i++ ){
       for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-          color_img.color[k][i-hfilt][j-hfilt] = img2[k][i][j];
+          color_img.color[k][i-hfilt][j-hfilt] = img[k][i][j];
       }
     }
   }
@@ -110,10 +107,6 @@ int main (int argc, char **argv)
   free_img((void**)img[1]);
   free_img((void**)img[2]);
   free(img);
-  free_img((void**)img2[0]);
-  free_img((void**)img2[1]);
-  free_img((void**)img2[2]);
-  free(img2);
   
   return(0);
 }
