@@ -13,7 +13,6 @@ int main (int argc, char **argv)
   int lfilt =3;
   int hfilt =(lfilt-1)/2;
   int32_t i,j,k,l,m;
-  int lambda = 1.5;
   if ( argc != 2 ) error( argv[0] );
 
   /* open image file */
@@ -48,26 +47,31 @@ int main (int argc, char **argv)
     for ( i = 0; i < pad_height; i++ )
       for ( j = 0; j < pad_width; j++ ) {
 	img[k][i][j] =0;
-  }
+      }
 
     /* copy components to double array */
      
     for (k = 0; k < 3; k++)
-    for ( i =hfilt-1; i < pad_height-lfilt+1; i++ )
-      for ( j = hfilt-1; j < pad_width-lfilt+1; j++ ) {
-	img[k][i][j] = input_img.color[k][i][j];
-  }
+    for ( i =0; i <input_img.height; i++ )
+      for (j =0; j <input_img.width; j++ ) {
+	img[k][i+hfilt][j+hfilt] = input_img.color[k][i][j];
+      }
 
     
  /* filter image channels */
  
     for (k =0; k < 3; k++){
-      for ( i =hfilt; i < input_img.height+hfilt; i++ ){
+      for ( i =hfilt; i < input_img.height+hfilt; i++ )
 	for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-	  img[k][i][j]=0.01*img[k][i][j]+0.9*(img[k][i+1][j]+img[k][i][j+1]-0.81*img[k][i+1][j+1]);
+	  img[k][i][j]=0.01*img[k][i][j]+0.9*(img[k][i-1][j]
+					      +img[k][i][j-1]-0.81*img[k][i-1][j-1]);
+  	  if (img[k][i][j] >255) {
+	    img[k][i][j] =255;
+	  }
+	  else if(img[k][i][j]<0){
+	    img[k][i][j]=0;
+	  }
 	}
-      }
-    } 
    
   /* set up structure for output color image */
   /* Note that the type is 'c' rather than 'g' */
