@@ -89,8 +89,8 @@ int main (int argc, char **argv)
   
     for (k =0; k < 3; k++)
       for ( i =hfilt; i < input_img.height+hfilt; i++ )
-	for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-	  img2[k][i][j] = (1+lambda)*img2[k][i][j]-lambda*img[k][i][j];
+	for ( j = hfilt; j < input_img.width+hfilt; j++ ){
+	  img2[k][i][j] = 1+lambda*(img2[k][i][j]-img[k][i][j]);
 	}
 
   
