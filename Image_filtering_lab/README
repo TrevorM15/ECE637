@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 This file gives details on how to use the C-subroutines
 for reading and writing TIFF files.
 
@@ -138,3 +139,6 @@ structure.
 
    width:  the width of the image, in units of pixels
 
+=======
+This is the first lab in Professor Bouman's ECE637 Image Processing 1
+>>>>>>> ab4f90664fa869c9dc80650e90b48dd282352356

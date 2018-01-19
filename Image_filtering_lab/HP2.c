@@ -10,10 +10,10 @@ int main (int argc, char **argv)
 {
   FILE *fp;
   struct TIFF_img input_img, color_img;
-  int lfilt =5;
+  int lfilt =9;
   int hfilt =(lfilt-1)/2;
   int32_t i,j,k,l,m;
-  int lambda = 1.5;
+
   if ( argc != 2 ) error( argv[0] );
 
   /* open image file */
@@ -59,41 +59,22 @@ int main (int argc, char **argv)
       for ( j = 0; j < input_img.width; j++ ) {
 	img[k][i+hfilt][j+hfilt] = input_img.color[k][i][j];
   }
-    
-        /* make second copy */
-    
-    for (k = 0; k < 3; k++)
-    for ( i =0; i < pad_height; i++ )
-      for ( j = 0; j < pad_width; j++ ) {
-	img2[k][i][j] = img[k][i][j];
-      }
- 
-    
- /* low-pass filter image channels */
+
+ /* filter image channels */
  
     for (k =0; k < 3; k++){
       for ( i =hfilt; i < input_img.height+hfilt; i++ ){
 	for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-	  img[k][i][j]=0; 
+	  img[k][i][j]=0;
 	  for (l = -hfilt; l<hfilt+1;l++){
 	    for (m = -hfilt;m<hfilt+1;m++){
-	      if((l!=0)||(m!=0)){
-	      img[k][i][j] +=img[k][i+l][j+m]/(lfilt*lfilt);
-	      }
+	      img[k][i][j] +=img[k][i-l][j+m]/(lfilt*lfilt);
 	    }
 	  }
 	}
       }
     } 
-    /* high-pass image */
-  
-    for (k =0; k < 3; k++)
-      for ( i =hfilt; i < input_img.height+hfilt; i++ )
-	for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-	  img2[k][i][j] = (1+lambda)*img2[k][i][j]-lambda*img[k][i][j];
-	}
-
-  
+   
   /* set up structure for output color image */
   /* Note that the type is 'c' rather than 'g' */
   get_TIFF ( &color_img, input_img.height, input_img.width, 'c' );
@@ -102,7 +83,7 @@ int main (int argc, char **argv)
   for (k = 0; k<3; k++){
     for ( i = hfilt; i <input_img.height+hfilt; i++ ){
       for ( j = hfilt; j < input_img.width+hfilt; j++ ) {
-          color_img.color[k][i-hfilt][j-hfilt] = img2[k][i][j];
+          color_img.color[k][i-hfilt][j-hfilt] = img[k][i][j];
       }
     }
   }
