@@ -21,20 +21,16 @@ end
 % Compute the power spectrum for the NxN region
 for k = 1:25
     z(:,:,k) = z(:,:,k).*w;
-    Z(:,:,k) = (1/N^2)*abs(fft2(z(:,:,k))).^2;
-    % Use fftshift to move the zero frequencies to the center of the plot
-    Z(:,:,k) = fftshift(Z(:,:,k));
-    % Compute the logarithm of the Power Spectrum.
-    Zabs(:,:,k) = log(Z(:,:,k));
+    Z(:,:,k) = fftshift(abs(fft2(z(:,:,k))).^2);
 end
 
-Zavg = mean(Zabs,3);
+Zavg = (1/(25*N^2))*sum(Z,3);
 % Plot the result using a 3-D mesh plot and label the x and y axises properly. 
 
 x = 2*pi*((0:(N-1)) - N/2)/N;
 y = 2*pi*((0:(N-1)) - N/2)/N;
 figure 
-mesh(x,y,Zavg)
+mesh(x,y,log(Zavg))
 xlabel('\mu axis')
 ylabel('\nu axis')
 end
