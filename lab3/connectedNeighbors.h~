@@ -1,0 +1,22 @@
+#ifndef connectedNeighbors.h
+#define connectedNeighbors.h
+
+void connectedNeighbors(
+			pixel s,
+			double T,
+			unsigned char **img,
+			int width,
+			int height,
+			int *M,
+			pixel c[4]);
+
+void connectedSet(
+		  pixel s,
+		  double T,
+		  unsigned char **img,
+		  int width,
+		  int height,
+		  int ClassLabel,
+		  unsigned int **seg,
+		  int *NumConPixels);
+#endif
