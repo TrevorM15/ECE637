@@ -107,21 +107,16 @@ int main (int argc, char **argv)
   struct TIFF_img iImg,Y;
   unsigned char **img;
   int32_t i,j;
-  int ClassLabel = 1;
-  int T =1;
-  int *M;  
+  int ClassLabel;
+  int T =1;  
   unsigned int **seg;
-
+  int numRegions, NumConPixels;
   typedef struct pixel pixel;
 
   struct pixel{
     int m,n;
   };
-
   pixel s;
-  s.m=67;
-  s.n=45;
-
 
   if ( argc != 2 ) error( argv[0] );
   /* open image file */
@@ -159,25 +154,37 @@ int main (int argc, char **argv)
   for ( i = 0; i < iImg.height; i++ )
   for ( j = 0; j < iImg.width; j++ ) {
     img[i][j] = iImg.mono[i][j];
-    seg[i][j]=0;
+    seg[i][j]=-1;
   }
-
-
-
-
-  /* TODO: part 1: find connected set of s=(67,45) */
   
-  /* TODO: segment the entire image*/
+  /* segment the entire image*/
+  numRegions =0;
+  ClassLabel=1;
+  T=1;
+  for(i=67; i<68; i++) /*change for full seg case */
+    for (j = 45; j<46; j++){
+      /*
+    for(i=0; i<iImg.height; i++) 
+    for (j = 0; j<iImg.width; j++){
+      */ 
+      s.m =i;
+      s.n=j;
+      NumConPixels=0;
+      if(seg[i][j]==-1){
+	connectedSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
+	  ClassLabel++;
+	if(NumConPixels >= 100){
+	  numRegions++;
+	}else{
+	  connectedSet( s,T,img,iImg.width,iImg.height,0,seg,&NumConPixels);
+	}
+	  }
+    }
 
-
-
-  /* TODO: output top 256 connected segments to output tiff img Y */
-  for (ClassLabel =1; ClassLabel<257;ClassLabel++)
+  /*  output top 256 connected segments to output tiff img Y */
   for ( i = 0; i < iImg.height; i++ )
   for ( j = 0; j < iImg.width; j++ ) {
-    if (seg[i][j]==ClassLabel){
       Y.mono[i][j] = seg[i][j];
-    }
   }
 
   /* set up structure for output segmented image */
