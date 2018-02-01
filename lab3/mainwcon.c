@@ -16,7 +16,7 @@ int main (int argc, char **argv)
   unsigned char **img;
   int32_t i,j;
   int ClassLabel;
-  int T =1;  
+  int T;  
   unsigned int **seg;
   int numRegions, NumConPixels;
   typedef struct pixel pixel;
@@ -54,11 +54,8 @@ int main (int argc, char **argv)
 
   /* Allocate image and segmentation space */
  img = (unsigned char **)get_img(iImg.width,iImg.height,sizeof(unsigned char));
- seg = (unsigned int **)get_img(iImg.width,iImg.height,sizeof(unsigned int));/*(unsigned int **)malloc(iImg.width*sizeof(unsigned int));
-  for (i=0; i<iImg.height;i++){
-    seg[i] = (unsigned int *)malloc(iImg.height*sizeof(unsigned int));
-  }
- */
+ seg = (unsigned int **)get_img(iImg.width,iImg.height,sizeof(unsigned int));
+ 
     /* fill arrays */
   for ( i = 0; i < iImg.height; i++ )
   for ( j = 0; j < iImg.width; j++ ) {
@@ -68,17 +65,19 @@ int main (int argc, char **argv)
   
   /* segment the entire image*/
   numRegions =0;
-  ClassLabel=255;
+  ClassLabel=1;
   T=1;
-  for(i=67; i<68; i++) /*change for full seg case */
+   /*change for full seg case */
+  /*
+  for(i=67; i<68; i++)
     for (j = 45; j<46; j++){
-      /*
+  */
     for(i=0; i<iImg.height; i++) 
     for (j = 0; j<iImg.width; j++){
-      */ 
+     
       s.m =i;
       s.n=j;
-      NumConPixels=0;
+      
       if(seg[i][j]==65000){
 	connectedSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
 	  ClassLabel++;
@@ -86,24 +85,21 @@ int main (int argc, char **argv)
 	  numRegions++;
 	}else{
 	  connectedSet( s,T,img,iImg.width,iImg.height,0,seg,&NumConPixels);
+	  ClassLabel--;
 	}
-	  }
+      }
     }
-
+    printf("The number of connected sets with >100 pixels is %d ./n",numRegions);
   
   /* set up structure for output segmented image */
   /* Note that the type is 'g' rather than 'c' */
   get_TIFF ( &Y, iImg.height, iImg.width, 'g' );
 
   
-  /*  output top 256 connected segments to output tiff img Y */
+  /*  output segmented image to tiff img Y */
   for ( i = 0; i < iImg.height; i++ )
   for ( j = 0; j < iImg.width; j++ ) {
-    if(seg[i][j]!=65000){
-      Y.mono[i][j] = seg[i][j];
-    }else{
-      Y.mono[i][j]=0;
-    }
+        Y.mono[i][j] = seg[i][j];
   }
 
 
@@ -136,7 +132,9 @@ int main (int argc, char **argv)
 void error(char *name)
 {
     printf("usage:  %s  image.tiff \n\n",name);
-    printf("this program reads in a 24-bit color TIFF image.\n");
+    printf("this program reads in a grayscale TIFF image.\n");
+    printf("and outputs a segmented version.\n");
+     
     exit(1);
 }
 
