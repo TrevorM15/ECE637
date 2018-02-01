@@ -7,7 +7,7 @@ typedef struct pixel pixel;
     int m,n;
   };
   
-void connectedNeighbors(pixel s,double T,unsigned char **img,int width,int height, int *M,pixel *c);
+void connectedNeighbors(pixel s,double T,unsigned char **img,int width,int height, int *M,struct pixel *c);
 
 void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int ClassLabel,unsigned int **seg,int *NumConPixels);
 

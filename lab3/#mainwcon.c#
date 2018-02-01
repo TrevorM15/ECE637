@@ -84,7 +84,7 @@ int main (int argc, char **argv)
 	}else{
 	  connectedSet( s,T,img,iImg.width,iImg.height,0,seg,&NumConPixels);
 	}
-	  }
+      }
     }
 
   
@@ -94,6 +94,7 @@ int main (int argc, char **argv)
 
   
   /*  output top 256 connected segments to output tiff img Y */
+  /* TODO: edit to only take top 256 regions/regions with over 100 pixels*/
   for ( i = 0; i < iImg.height; i++ )
   for ( j = 0; j < iImg.width; j++ ) {
     if(seg[i][j]!=65000){

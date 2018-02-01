@@ -6,29 +6,29 @@ typedef struct pixel pixel;
     int m,n;
   };
 
-void connectedNeighbors(pixel s,double T,unsigned char **img,int width,int height, int *M,pixel *c[4]) {
+void connectedNeighbors(pixel s,double T,unsigned char **img,int width,int height, int *M,struct pixel *c) {
   
   int count = 0;
   
   if (fabs(img[s.m][s.n]-img[s.m-1][s.n])<=T && s.m-1 >0){
       count++;
-      c[0]->m=s.m-1;
-      c[0]->n=s.n;
+      c[0].m=s.m-1;
+      c[0].n=s.n;
     }
 if (fabs(img[s.m][s.n]-img[s.m+1][ s.n])<=T && s.m+1<width){
         count++;
-	c[1]->m=s.m+1;
-	c[1]->n=s.n;
+	c[1].m=s.m+1;
+	c[1].n=s.n;
     }
 if (fabs(img[s.m][s.n]-img[s.m][ s.n-1])<=T && s.n-1 >0){
         count++;
-	c[2]->m=s.m;
-	c[3]->n=s.n-1;
+	c[2].m=s.m;
+	c[3].n=s.n-1;
     }
 if (fabs(img[s.m][s.n]-img[s.m][ s.n+1])<=T && s.n+1<height){
         count++;
-	c[3]->m=s.m;
-	c[3]->n=s.n+1;
+	c[3].m=s.m;
+	c[3].n=s.n+1;
     }
  *M =count;
 }
