@@ -5,101 +5,9 @@
 #include "tiff.h"
 #include "allocate.h"
 #include "typeutil.h"
+#include "segmentation.h"
 
 void error(char *name);
-
-typedef struct pixel pixel;
-
-  struct pixel{
-    int m,n;
-  };
-  
-void connectedNeighbors(pixel s,double T,unsigned char **img,int width,int height, int *M,pixel c[4]) {
-  
-  int count = 0;
-  
-  if (fabs(img[s.m][s.n]-img[s.m-1][s.n])<=T && s.m-1 >0){
-      count++;
-      c[0].m=s.m-1;
-      c[0].n=s.n;
-    }
-if (fabs(img[s.m][s.n]-img[s.m+1][ s.n])<=T && s.m+1<width){
-        count++;
-	c[0].m=s.m+1;
-      c[0].n=s.n;
-    }
-if (fabs(img[s.m][s.n]-img[s.m][ s.n-1])<=T && s.n-1 >0){
-        count++;
-	c[0].m=s.m;
-      c[0].n=s.n-1;
-    }
-if (fabs(img[s.m][s.n]-img[s.m][ s.n+1])<=T && s.n+1<height){
-        count++;
-	c[0].m=s.m;
-	c[0].n=s.n+1;
-    }
-  *M =count;
-}
-
-void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int ClassLabel,unsigned int **seg,int *NumConPixels){
-  int i,j,*M;
-  pixel c[4];
-  int  **B;
-  B = (int **)malloc(width*height*sizeof(int));
-  for (i=0; i<2; i++){
-    B[i] = (int*)malloc(2*sizeof(int));
-  }
-  for (i = 0; i<width*height;i++)
-    for(j =0; j<2; j++){
-      B[i][j]=-1;
-    }
-  i=0;
-  M=0;
-  j = i;
-  B[i][0]= s.m;
-  B[i][1]=s.n;
-  while (B[j][0] !=-1){
-
-    for(j=0;j<4;j++){
-      c[j].m = -1;
-      c[j].n=-1;
-    }
-     connectedNeighbors( s,T,img,width,height, M, &c[4]);
-
-    
-    if(c[0].m != -1  && seg[s.m-1][ s.n]==0){
-      seg[s.m-1][s.n]=ClassLabel;
-	i++;
-	B[i][0]=s.m-1;
-	B[i][1]=s.n;
-    }
-    if (c[1].m != -1 && seg[s.m+1][ s.n]==0){
-      seg[s.m+1][s.n]=ClassLabel;
-        i++;
-	B[i][0]=s.m+1;
-	B[i][1]=s.n;
-    }
-    if( c[2].m !=-1 && seg[s.m][ s.n-1]==0){
-      seg[s.m][s.n-1]=ClassLabel;
-	i++;
-	B[i][0]=s.m;
-	B[i][1]=s.n-1;
-    }
-    if (c[3].m !=-1 && seg[s.m][ s.n+1]==0){
-        seg[s.m][s.n+1]=ClassLabel;
-	i++;
-	B[i][0]=s.m;
-	B[i][1]=s.n+1;
-    }
-    B[j][0]=-1;
-    B[j][1]= -1;
-    j++;
-    s.m=B[j][0];
-    s.n=B[j][1];
-    *NumConPixels += *M;
-  }
-
-}
 
 int main (int argc, char **argv) 
 {
@@ -146,20 +54,21 @@ int main (int argc, char **argv)
 
   /* Allocate image and segmentation space */
  img = (unsigned char **)get_img(iImg.width,iImg.height,sizeof(unsigned char));
- seg = (unsigned int **)malloc(iImg.height*sizeof(unsigned int));
-  for (i=0; i<iImg.width;i++){
-    seg[i] = (unsigned int *)malloc(iImg.width*sizeof(unsigned int));
+ seg = (unsigned int **)get_img(iImg.width,iImg.height,sizeof(unsigned int));/*(unsigned int **)malloc(iImg.width*sizeof(unsigned int));
+  for (i=0; i<iImg.height;i++){
+    seg[i] = (unsigned int *)malloc(iImg.height*sizeof(unsigned int));
   }
+ */
     /* fill arrays */
   for ( i = 0; i < iImg.height; i++ )
   for ( j = 0; j < iImg.width; j++ ) {
     img[i][j] = iImg.mono[i][j];
-    seg[i][j]=-1;
+    seg[i][j]=65000;
   }
   
   /* segment the entire image*/
   numRegions =0;
-  ClassLabel=1;
+  ClassLabel=255;
   T=1;
   for(i=67; i<68; i++) /*change for full seg case */
     for (j = 45; j<46; j++){
@@ -170,7 +79,7 @@ int main (int argc, char **argv)
       s.m =i;
       s.n=j;
       NumConPixels=0;
-      if(seg[i][j]==-1){
+      if(seg[i][j]==65000){
 	connectedSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
 	  ClassLabel++;
 	if(NumConPixels >= 100){
@@ -181,17 +90,23 @@ int main (int argc, char **argv)
 	  }
     }
 
-  /*  output top 256 connected segments to output tiff img Y */
-  for ( i = 0; i < iImg.height; i++ )
-  for ( j = 0; j < iImg.width; j++ ) {
-      Y.mono[i][j] = seg[i][j];
-  }
-
+  
   /* set up structure for output segmented image */
   /* Note that the type is 'g' rather than 'c' */
   get_TIFF ( &Y, iImg.height, iImg.width, 'g' );
+
   
-  
+  /*  output top 256 connected segments to output tiff img Y */
+  for ( i = 0; i < iImg.height; i++ )
+  for ( j = 0; j < iImg.width; j++ ) {
+    if(seg[i][j]!=65000){
+      Y.mono[i][j] = seg[i][j];
+    }else{
+      Y.mono[i][j]=0;
+    }
+  }
+
+
   /* Open output  image file */
   if ( ( fp = fopen ( "Y.tif", "wb" ) ) == NULL ) {
     fprintf ( stderr, "cannot open file Y.tif\n");
@@ -212,9 +127,8 @@ int main (int argc, char **argv)
   /* de-allocate space which was used for the images */
   free_TIFF ( &(iImg) );
   free_TIFF ( &(Y) );
-  free((void**)seg);
-   free_img((void**)img);
-    
+  free_img((void**)seg);
+  free_img((void**)img);
 
   return(0);
 }

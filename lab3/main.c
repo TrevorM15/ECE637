@@ -97,8 +97,8 @@ int main (int argc, char **argv)
   free_TIFF ( &(Y) );
 
   
-  free_img( (void**)img1 );
-  free_img( (void**)img2 );  
+  free_img( (void**)img );
+    
 
   return(0);
 }
