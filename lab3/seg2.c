@@ -60,45 +60,40 @@ void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int
       c[j].n=-1;
     }
     
-    connectedNeighbors( s,T,img,width,height, M, c);
+    connectedNeighbors( s,T,img,width,height,M, c);
     
     if(s.m-1> 0 && c[0].m != -1  && seg[s.m-1][ s.n]!=ClassLabel){
       seg[s.m-1][s.n]=ClassLabel;
 	i++;
 	B[i][0]=s.m-1;
 	B[i][1]=s.n;
-    }else if(s.m-1> 0 && c[0].m != -1  && seg[s.m-1][ s.n]==ClassLabel){
-      *M--;
     }
     if (s.m+1<height && c[1].m != -1 && seg[s.m+1][ s.n]!=ClassLabel){
       seg[s.m+1][s.n]=ClassLabel;
         i++;
 	B[i][0]=s.m+1;
 	B[i][1]=s.n;
-    }else if(s.m+1<height && c[1].m != -1  && seg[s.m+1][ s.n]==ClassLabel){
-      *M--;
     }
     if( s.n-1>0 && c[2].m !=-1 && seg[s.m][ s.n-1]!=ClassLabel){
       seg[s.m][s.n-1]=ClassLabel;
 	i++;
 	B[i][0]=s.m;
 	B[i][1]=s.n-1;
-    }else if(s.n-1> 0 && c[2].m != -1  && seg[s.m][ s.n-1]==ClassLabel){
-      *M--;
     }
     if (s.n+1< width && c[3].m !=-1 && seg[s.m][ s.n+1]!=ClassLabel){
         seg[s.m][s.n+1]=ClassLabel;
 	i++;
 	B[i][0]=s.m;
 	B[i][1]=s.n+1;
-    }else if(s.m+1 <width && c[3].m != -1  && seg[s.m][ s.n+1]==ClassLabel){
-      *M--;
     }
+    B[k][0]=-1;
+    B[k][1]= -1;
     k++;
     s.m=B[k][0];
     s.n=B[k][1];
-    (*NumConPixels) += *M;
+    (*NumConPixels)+=*M;
   }
+  (*NumConPixels)=ceil( *NumConPixels/2);
 for (i=0; i<height*width; i++){
   free(B[i]);
   }

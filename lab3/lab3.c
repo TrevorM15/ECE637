@@ -5,7 +5,7 @@
 #include "tiff.h"
 #include "allocate.h"
 #include "typeutil.h"
-#include "seg.h"
+#include "seg2.h"
 
 void error(char *name);
 
@@ -65,17 +65,27 @@ int main (int argc, char **argv)
   /* segment image */
   numRegions =0;
   ClassLabel=1;
-  T=2;
+  T=3;
   NumConPixels=0;
-    for(i=67; i<68; i++)
+  /*    for(i=67; i<68; i++)
     for (j = 45; j<46; j++){
+  */
+    for ( i = 0; i < iImg.height; i++ )
+    for ( j = 0; j < iImg.width; j++ ) {
        s.m =i;
-      s.n=j;
+       s.n=j;
       if(seg[i][j]==65000){
+	if(NumConPixels <100){
+	connectedSet( s,T,img,iImg.width,iImg.height,0,seg,&NumConPixels);
+	}else {
+	  numRegions++;
 	connectedSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
+	ClassLabel++;
+	}
       }
+      
     }
-
+    printf("The number of regions is %d .\n",numRegions);
     
   /* set up structure for output segmented image */
   /* Note that the type is 'g' rather than 'c' */
