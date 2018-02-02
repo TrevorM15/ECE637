@@ -11,4 +11,6 @@ void connectedNeighbors(pixel s,double T,unsigned char **img,int width,int heigh
 
 void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int ClassLabel,unsigned int **seg,int *NumConPixels);
 
+void rmSet( pixel s,double T,unsigned char **img,int width,int height,int ClassLabel,unsigned int **seg,int *NumConPixels);
+
 #endif

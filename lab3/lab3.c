@@ -75,15 +75,15 @@ int main (int argc, char **argv)
        s.m =i;
        s.n=j;
       if(seg[i][j]==65000){
+	connectedSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
 	if(NumConPixels <100){
-	connectedSet( s,T,img,iImg.width,iImg.height,0,seg,&NumConPixels);
+	rmSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
 	}else {
 	  numRegions++;
-	connectedSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
-	ClassLabel++;
+	  ClassLabel++;
 	}
+	NumConPixels=0;
       }
-      
     }
     printf("The number of regions is %d .\n",numRegions);
     
