@@ -65,7 +65,7 @@ int main (int argc, char **argv)
   /* segment image */
   numRegions =0;
   ClassLabel=1;
-  T=3;
+  T=1;
   NumConPixels=0;
   /*    for(i=67; i<68; i++)
     for (j = 45; j<46; j++){

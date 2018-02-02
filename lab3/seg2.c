@@ -34,7 +34,7 @@ if ( s.n+1<width && fabs(img[s.m][s.n]-img[s.m][ s.n+1])<=T){
 }
 
 void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int ClassLabel,unsigned int **seg,int *NumConPixels){
-  int i,j,k,*M;
+  int i,j,k,*M, count;
   pixel c[4];
   double  **B;
   B = (double **)malloc(height*width*sizeof(double));
@@ -51,7 +51,7 @@ void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int
   *NumConPixels=0;
   B[i][0]= s.m;
   B[i][1]=s.n;
-  
+  /*make another counter that checks how many values have neighbors have already been counted. subtract that from *M and add it to numconpixels. make sure to do this for connectedset and rmset*/  
      
   while (B[k][0] !=-1){
 
@@ -59,48 +59,60 @@ void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int
       c[j].m = -1;
       c[j].n=-1;
     }
-    
+    count = 0;
     connectedNeighbors( s,T,img,width,height, M, c);
     seg[s.m][s.n]=ClassLabel;  
     if(s.m-1> 0 && c[0].m != -1  && seg[s.m-1][ s.n]!=ClassLabel){
       seg[s.m-1][s.n]=ClassLabel;
 	i++;
+	count++;
 	B[i][0]=s.m-1;
 	B[i][1]=s.n;
+    } else if (s.m-1<height && c[0].m != -1 && seg[s.m-1][ s.n]==ClassLabel){
+      count++;
     }
     if (s.m+1<height && c[1].m != -1 && seg[s.m+1][ s.n]!=ClassLabel){
       seg[s.m+1][s.n]=ClassLabel;
         i++;
+	count++;
 	B[i][0]=s.m+1;
 	B[i][1]=s.n;
+    }else if (s.m+1<height && c[1].m != -1 && seg[s.m+1][ s.n]==ClassLabel){
+      count++;
     }
     if( s.n-1>0 && c[2].m !=-1 && seg[s.m][ s.n-1]!=ClassLabel){
       seg[s.m][s.n-1]=ClassLabel;
 	i++;
+	count++;
 	B[i][0]=s.m;
 	B[i][1]=s.n-1;
+    }else if(s.n-1> 0 && c[2].m != -1  && seg[s.m][ s.n-1]==ClassLabel){
+	count++;
     }
     if (s.n+1< width && c[3].m !=-1 && seg[s.m][ s.n+1]!=ClassLabel){
         seg[s.m][s.n+1]=ClassLabel;
 	i++;
+
 	B[i][0]=s.m;
 	B[i][1]=s.n+1;
+    }else if(s.n+1> 0 && c[3].m != -1  && seg[s.m][ s.n+1]==ClassLabel){
+	count++;
     }
     B[k][0]=-1;
     B[k][1]= -1;
     k++;
     s.m=B[k][0];
     s.n=B[k][1];
-    (*NumConPixels)+=*M;
+    (*NumConPixels)+=*M-count;
   }
-  (*NumConPixels)=ceil( *NumConPixels/2);
+
 for (i=0; i<height*width; i++){
   free(B[i]);
   }
  free(B);
 }
 void rmSet( pixel s,double T,unsigned char **img,int width,int height,int ClassLabel,unsigned int **seg,int *NumConPixels){
-  int i,j,k,*M;
+  int i,j,k,*M,count;
   pixel c[4];
   double  **B;
   B = (double **)malloc(height*width*sizeof(double));
@@ -125,30 +137,34 @@ void rmSet( pixel s,double T,unsigned char **img,int width,int height,int ClassL
       c[j].m = -1;
       c[j].n=-1;
     }
-    
+    count=0;
     connectedNeighbors( s,T,img,width,height, M, c);
     seg[s.m][s.n]=0;
     if(s.m-1> 0 && c[0].m != -1  && seg[s.m-1][ s.n]==ClassLabel){
       seg[s.m-1][s.n]=0;
 	i++;
+	count++;
 	B[i][0]=s.m-1;
 	B[i][1]=s.n;
     }
     if (s.m+1<height && c[1].m != -1 && seg[s.m+1][ s.n]==ClassLabel){
       seg[s.m+1][s.n]=0;
         i++;
+	count++;
 	B[i][0]=s.m+1;
 	B[i][1]=s.n;
     }
     if( s.n-1>0 && c[2].m !=-1 && seg[s.m][ s.n-1]==ClassLabel){
       seg[s.m][s.n-1]=0;
 	i++;
+	count++;
 	B[i][0]=s.m;
 	B[i][1]=s.n-1;
     }
     if (s.n+1< width && c[3].m !=-1 && seg[s.m][ s.n+1]==ClassLabel){
         seg[s.m][s.n+1]=0;
 	i++;
+	count++;
 	B[i][0]=s.m;
 	B[i][1]=s.n+1;
     }
@@ -157,9 +173,8 @@ void rmSet( pixel s,double T,unsigned char **img,int width,int height,int ClassL
     k++;
     s.m=B[k][0];
     s.n=B[k][1];
-    (*NumConPixels)+=*M;
+    (*NumConPixels)+=*M-count;
   }
-  (*NumConPixels)=ceil( *NumConPixels/2);
 for (i=0; i<height*width; i++){
   free(B[i]);
   }
