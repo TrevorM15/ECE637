@@ -15,17 +15,17 @@ void connectedNeighbors(pixel s,double T,unsigned char **img,int width,int heigh
       c[0].m=s.m-1;
       c[0].n=s.n;
     }
-if (s.m+1<height && fabs(img[s.m][s.n]-img[s.m+1][s.n])<=T){
+if (s.m+1<height && fabs(img[s.m][s.n]-img[s.m+1][ s.n])<=T){
         count++;
 	c[1].m=s.m+1;
 	c[1].n=s.n;
     }
-if ( s.n-1 >0 && fabs(img[s.m][s.n]-img[s.m][s.n-1])<=T){
+if ( s.n-1 >0 && fabs(img[s.m][s.n]-img[s.m][ s.n-1])<=T){
         count++;
 	c[2].m=s.m;
-	c[2].n=s.n-1;
+	c[3].n=s.n-1;
     }
-if ( s.n+1<width && fabs(img[s.m][s.n]-img[s.m][s.n+1])<=T){
+if ( s.n+1<width && fabs(img[s.m][s.n]-img[s.m][ s.n+1])<=T){
         count++;
 	c[3].m=s.m;
 	c[3].n=s.n+1;
@@ -42,7 +42,7 @@ void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int
     B[i] = (double*)malloc(2*sizeof(double));
   }
   for (i = 0; i<width*height;i++)
-  for(j =0; j<2; j++){
+    for(j =0; j<2; j++){
       B[i][j]=-1;
     }
   i=0;
@@ -51,7 +51,7 @@ void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int
   *NumConPixels=0;
   B[i][0]= s.m;
   B[i][1]=s.n;
-  
+  seg[s.m][s.n]=ClassLabel;
      
   while (B[k][0] !=-1){
 
@@ -60,8 +60,6 @@ void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int
       c[j].n=-1;
     }
     
-    seg[s.m][s.n]=ClassLabel;
-    
     connectedNeighbors( s,T,img,width,height, M, c);
     
     if(s.m-1> 0 && c[0].m != -1  && seg[s.m-1][ s.n]!=ClassLabel){
@@ -69,41 +67,30 @@ void connectedSet( pixel s,double T,unsigned char **img,int width,int height,int
 	i++;
 	B[i][0]=s.m-1;
 	B[i][1]=s.n;
-    }else if(s.m-1> 0 && c[0].m != -1  && seg[s.m-1][ s.n]==ClassLabel){
-      *M--;
     }
     if (s.m+1<height && c[1].m != -1 && seg[s.m+1][ s.n]!=ClassLabel){
       seg[s.m+1][s.n]=ClassLabel;
         i++;
 	B[i][0]=s.m+1;
 	B[i][1]=s.n;
-    }else if(s.m+1 <height && c[1].m != -1  && seg[s.m+1][ s.n]==ClassLabel){
-      *M--;
     }
     if( s.n-1>0 && c[2].m !=-1 && seg[s.m][ s.n-1]!=ClassLabel){
       seg[s.m][s.n-1]=ClassLabel;
 	i++;
 	B[i][0]=s.m;
 	B[i][1]=s.n-1;
-    }else if(s.n-1>0 && c[2].m != -1  && seg[s.m][ s.n-1]==ClassLabel){
-      *M--;
     }
     if (s.n+1< width && c[3].m !=-1 && seg[s.m][ s.n+1]!=ClassLabel){
         seg[s.m][s.n+1]=ClassLabel;
 	i++;
 	B[i][0]=s.m;
 	B[i][1]=s.n+1;
-    }else if(s.n+1 <width && c[3].m != -1  && seg[s.m][ s.n+1]==ClassLabel){
-      *M--;
-    }
-
-    k++;
+    } B[k][0]=-1;
+    B[k][1]= -1;
+ k++;
     s.m=B[k][0];
     s.n=B[k][1];
     (*NumConPixels) += *M;
   }
-  for (i=0; i<height*width; i++){
-    free( B[i]);
-  }
-  free(B);
+
 }

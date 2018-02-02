@@ -5,12 +5,12 @@
 #include "tiff.h"
 #include "allocate.h"
 #include "typeutil.h"
-#include "seg.h"
+#include "segmentation.h"
 
 void error(char *name);
 
 int main (int argc, char **argv) 
-
+{
   FILE *fp;
   struct TIFF_img iImg,Y;
   unsigned char **img;
@@ -62,36 +62,21 @@ int main (int argc, char **argv)
     img[i][j] = iImg.mono[i][j];
     seg[i][j]=65000;
   }
-  
-  /* segment the entire image*/
+  /* segment image */
   numRegions =0;
   ClassLabel=1;
   T=2;
   NumConPixels=0;
-   /*change for full seg case */
-  
-  for(i=67; i<68; i++)
+    for(i=67; i<68; i++)
     for (j = 45; j<46; j++){
-      /*  
-    for(i=0; i<iImg.height; i++) 
-    for (j = 0; j<iImg.width; j++){
-  */
-      s.m =i;
+       s.m =i;
       s.n=j;
-      
       if(seg[i][j]==65000){
 	connectedSet( s,T,img,iImg.width,iImg.height,ClassLabel,seg,&NumConPixels);
-	  ClassLabel++;
-	if(NumConPixels >= 100){
-	  numRegions++;
-	}else{
-	  connectedSet( s,T,img,iImg.width,iImg.height,0,seg,&NumConPixels);
-	  ClassLabel--;
-	}
       }
     }
-    printf("The number of connected sets with >100 pixels is %d ./n",numRegions);
-  
+
+    
   /* set up structure for output segmented image */
   /* Note that the type is 'g' rather than 'c' */
   get_TIFF ( &Y, iImg.height, iImg.width, 'g' );
@@ -138,4 +123,3 @@ void error(char *name)
      
     exit(1);
 }
-

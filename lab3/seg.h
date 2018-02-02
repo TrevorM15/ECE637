@@ -1,5 +1,5 @@
-#ifndef SEGMENTATION_H_
-#define SEGMENTATION_H_
+#ifndef SEG_H_
+#define SEG_H_
 
 typedef struct pixel pixel;
 
