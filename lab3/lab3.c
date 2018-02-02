@@ -5,7 +5,7 @@
 #include "tiff.h"
 #include "allocate.h"
 #include "typeutil.h"
-#include "segmentation.h"
+#include "seg.h"
 
 void error(char *name);
 
