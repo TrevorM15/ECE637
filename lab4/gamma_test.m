@@ -25,18 +25,23 @@ end
 figure(1)
 image(h(:,:,38));
 title('Gamma of 165')
-%%
+%% Gamma Correction
 lin = imread('linear.tif');
 
 fig2=figure(2); image(lin);title('linear.tif uncorrected'); colormap(gray(256));
 truesize(fig2)
 
-lin = im2double(lin);
+lin = double(lin);
 linc=255*(lin/255).^(1/1.6);
-linc=uint8(255*linc);
+linc=uint8(linc);
 fig3=figure(3);image(linc); truesize(fig3)
 title('linear.tif gamma corrected \gamma = 1.6');colormap(gray(256));
 
-
+lin15 = imread('gamma15.tif');
+lin15 = im2double(lin15);
+lin15c=lin15.^(1.5/1.6);
+lin15c=uint8(255*lin15c);
+fig4=figure(4);image(lin15c); truesize(fig4)
+title('linear.tif gamma corrected from \gamma = 1.5 to \gamma = 1.6');colormap(gray(256));
 
 
