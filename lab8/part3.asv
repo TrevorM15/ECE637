@@ -1,0 +1,21 @@
+img = imread('house.tif');
+img = double(img);
+b=img;
+T=127;
+b(b<=T)=0;
+b(b>T)=255;
+h1=figure; image(uint8(b)); colormap(gray(256)); truesize(h1, size(b));
+RMSE = sqrt(1/(size(b,1)*size(b,2))*sum(sum(img-b)).^2);
+fl = 255*(img./255).^(2.2);
+bl=255*(b./255).^(2.2);
+var = 2;
+c=1;
+h = @(i,j) c*exp(-((i-3:i+3).^2+(j-3:j+3).^2)./(2*var));
+fl = padarray(fl, [3 3], 0, 'both');
+bl= padarray(bl, [3 3], 0, 'both');
+for i = 4:size(fl,1)-3
+    for j = 4:size(fl,2)-3
+        fl(i,j) = 
+    end
+end
+fidelity = sqrt(1/(size(b,1)*size(b,2))*sum(sum(ft-bt))^2 );
