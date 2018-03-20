@@ -1,0 +1,29 @@
+Y = imread('img14g.tif');
+Y = im2double(Y);
+X=imread('img14sp.tif');
+X=im2double(X);
+%%
+Z = zeros(floor(size(Y,1)/20)*floor(size(Y,2)/20), 7, 7);
+k = 1;
+for i = floor(linspace(4, 509,floor(size(Y,1)/20)))
+    for j = floor(linspace(4,765,floor(size(Y,2)/20)))
+    Z(k,:,:) = X(i-3:i+3, j-3:j+3);
+    k=k+1;
+    end
+end
+Z = reshape(Z, 950, 49);
+
+y = Y(floor(linspace(4, 509,floor(size(Y,1)/20))),floor(linspace(4,765,floor(size(Y,2)/20))));
+y = reshape(y, 950,1);
+
+Rzz=Z'*Z./950;
+rzy=Z'*y./950;
+theta=Rzz\rzy;
+theta= reshape(theta, 7,7);
+Xhat=imfilter(X.^2.2,theta); %image must be converted to energy to properly convolve in energy
+Xhat=255*Xhat;
+Xhat(Xhat<0)=0;
+ Xhat=255*(Xhat/255).^(1/2.2); %convert gamma correct for proper display
+Xhat(Xhat>255)=255;
+figure; image(uint8(Xhat)); colormap(gray(256))
+figure; image(uint8(255*(wiener2(X)))); colormap(gray(256))
