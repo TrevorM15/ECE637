@@ -1,0 +1,22 @@
+%%
+img = imread('house.tif');
+img = double(img);
+%%
+T= 127;
+imgl = 255*(img./255).^(2.2);
+b=zeros(size(imgl));
+e=zeros(size(imgl,1)+2,size(imgl,2)+1);
+ft=zeros(size(imgl));
+h = @(i,j) (7/16)*e(i+1, j)+(3/16)*e(i-1, j+1)+(5/16)*e(i, j+1)+(1/16)*e(i+1, j+1);
+for i = 1:size(b,1)
+    for j = 1:size(b,2)
+        ft(i,j) = imgl(i,j)+h(i+1,j);
+        if ft(i,j) >T
+            b(i,j) = 255;
+        else
+            b(i,j) = 0;
+        end
+        e(i+1,j)= ft(i,j)-b(i,j);
+    end
+end
+h1 = figure; image(b); truesize(h1, size(b));colormap(gray(256));
